@@ -8,7 +8,7 @@ if [[ "$(uname -s)" = "Darwin" ]]; then
 	is_mac=1
 fi
 
-if [[ $# -ne 2 ]]; then
+if [[ $# -ne 1 && $# -ne 2 ]]; then
 	if [[ "${is_mac}" -eq 1 ]]; then
 		echo "Usage: $0 <linux version such as ubuntu20.04> [path to xctoolchain]"
 	else
