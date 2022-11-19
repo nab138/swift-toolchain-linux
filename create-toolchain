@@ -1,13 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 cd "$(dirname "$0")"
 
 DARWIN_TOOLS_VERSION="2.2.0"
 
-[[ "$(uname -s)" = "Darwin" ]] && is_mac=true
+if [[ "$(uname -s)" = "Darwin" ]]; then
+	is_mac=1
+fi
 
-if [[ $# -ne 1 && $# -ne 2 ]]; then 
-	if [[ "${is_mac}" = true ]]; then
+if [[ $# -ne 2 ]]; then
+	if [[ "${is_mac}" -eq 1 ]]; then
 		echo "Usage: $0 <linux version such as ubuntu20.04> [path to xctoolchain]"
 	else
 		echo "Usage: $0 <swift version> [linux version such as ubuntu20.04]"
@@ -26,12 +28,14 @@ rm -rf toolchains/*.tmp
 
 # Download and cache
 dl() {
-	[[ -f "$1" ]] && return
+	if [[ -f "$1" ]]; then
+		return
+	fi
 	curl -#Lo "$1.tmp" "$2"
 	mv "$1.tmp" "$1"
 }
 
-if [[ "${is_mac}" = true ]]; then
+if [[ "${is_mac}" -eq 1 ]]; then
 	linux_version="$1"
 	mac_toolchain="$(cd "${2:-"$(xcode-select -p)/Toolchains/XcodeDefault.xctoolchain"}" && pwd)"
 	swift_version="$("${mac_toolchain}/usr/bin/swift" --version 2>/dev/null | head -1 | cut -f4 -d" ")"
@@ -81,12 +85,12 @@ mv linux/{usr,host}
 
 info "Modifying Linux toolchain"
 
-function link_file {
+link_file() {
 	# example of $1: linux/host/bin/swiftc
 	usr_path="${1#linux/host/}"
 	iphone_path="linux/iphone/${usr_path}"
 	mkdir -p "$(dirname "${iphone_path}")"
-	# calculate relative path to host file; based on 
+	# calculate relative path to host file; based on
 	# https://stackoverflow.com/a/27175714/3769927
 	usr_path_curr="${usr_path}"
 	rel_prefix="../"
