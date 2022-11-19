@@ -32,11 +32,15 @@ jobs:
     - name: Download Artifacts
       uses: actions/download-artifact@main
 
+    - name: Set TAG Variable
+      run: |
+        echo "TAG=${GITHUB_REF#refs/tags/}" >> "$GITHUB_ENV"
+
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       with:
-        tag_name: ${{ github.ref }}
+        tag_name: ${{ env.TAG }}
         release_name: Draft Release
         body: ''
         draft: true
@@ -48,4 +52,4 @@ jobs:
         for tc in **/*.tar.xz; do
           toolchains+=("-a" "$tc")
         done
-        hub release edit "${toolchains[@]}" -m "Draft Release" "${{ github.ref }}"
+        hub release edit "${toolchains[@]}" -m "Draft Release" "$TAG"
