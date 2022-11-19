@@ -31,7 +31,7 @@ dl() {
 	if [[ -f "$1" ]]; then
 		return
 	fi
-	curl -#Lo "$1.tmp" "$2"
+	curl -Lo "$1.tmp" "$2"
 	mv "$1.tmp" "$1"
 }
 

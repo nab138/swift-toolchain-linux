@@ -12,8 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@main
-    - name: Build Release
-      id: build_release
+    - name: Prep Work
       run: |
         git clone --depth=1 https://github.com/mackyle/xar
         pushd xar/xar/
@@ -22,6 +21,10 @@ jobs:
         make -j$(nproc --all)
         sudo make -j$(nproc --all) install
         popd
+
+    - name: Build Release
+      id: build_release
+      run: |
         ./create-toolchain ${{ matrix.os }}
 
     - uses: actions/upload-artifact@main
