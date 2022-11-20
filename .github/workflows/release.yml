@@ -25,7 +25,7 @@ jobs:
     - name: Build Release
       id: build_release
       run: |
-        ./create-toolchain ${{ matrix.os }}
+        ./create-toolchain 5.7 ${{ matrix.os }}
 
     - uses: actions/upload-artifact@main
       with:
