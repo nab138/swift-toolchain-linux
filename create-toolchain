@@ -63,7 +63,7 @@ else
 	mkdir -p mac
 	rm -rf mac/*
 	cd mac
-	gzip -cvd "${package_mac}/Payload" | cpio -iv
+	lzma -cvd "${package_mac}/Payload" | cpio -iv
 	cd ../
 	rm -rf "${package_mac}"
 	mac_toolchain="mac"
