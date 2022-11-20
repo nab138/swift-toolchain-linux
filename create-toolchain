@@ -59,10 +59,10 @@ else
 	cd toolchains
 	dl "toolchain-mac-${swift_version}.pkg" "https://swift.org/builds/swift-${swift_version}-release/xcode/swift-${swift_version}-RELEASE/${file_name_mac}.pkg"
 	info "Unpacking macOS toolchain"
-	bsdtar -xvf "toolchain-mac-${swift_version}.pkg" # extract Payload
+	bsdtar -xvf "toolchain-mac-${swift_version}.pkg" "${package_mac}/Payload"
 	mkdir -p mac
 	rm -rf mac/*
-	bsdtar -xvf "${package_mac}/Payload" -C mac # extract payload contents
+	bsdtar -xvf "${package_mac}/Payload" -C mac
 	rm -rf *.pkg
 	mac_toolchain="mac"
 fi
