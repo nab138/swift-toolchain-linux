@@ -12,19 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@main
-    - name: Prep Work
-      run: |
-        git clone --depth=1 https://github.com/mackyle/xar
-        pushd xar/xar/
-        sed -i 's@OpenSSL_add_all_ciphers@OPENSSL_init_crypto@' configure.ac
-        ./autogen.sh
-        make -j$(nproc --all)
-        sudo make -j$(nproc --all) install
-        popd
-
     - name: Build Release
       id: build_release
       run: |
+        sudo apt install libarchive-tools
         ./create-toolchain 5.7 ${{ matrix.os }}
 
     - uses: actions/upload-artifact@main
