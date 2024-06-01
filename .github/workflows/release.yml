@@ -33,7 +33,8 @@ jobs:
     - name: Build Release
       id: build_release
       run: |
-        DEVELOPER_DIR=/Applications/Xcode_15.1.app/Contents/Developer ./create-toolchain ${{ matrix.os }}
+        # pin at Swift v5.8.1 as > versions have ABI issues ....
+        DEVELOPER_DIR=/Applications/Xcode_14.3.app/Contents/Developer ./create-toolchain ${{ matrix.os }}
 
     - name: Attach Build To Release
       run: |
