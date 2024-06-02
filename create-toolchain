@@ -6,13 +6,16 @@ DARWIN_TOOLS_VERSION="2.2.1"
 
 [[ "$(uname -s)" = "Darwin" ]] && is_mac=true
 
-if [[ $# -ne 1 && $# -ne 2 ]]; then
-	if [[ "${is_mac}" = true ]]; then
-		echo "Usage: $0 <linux version such as ubuntu20.04> [path to xctoolchain]"
-	else
-		echo "Usage: $0 <swift version> [linux version such as ubuntu20.04]"
+if [[ "${is_mac}" = true ]]; then
+	if [[ $# -ne 1 && $# -ne 2 ]]; then
+		echo "Usage: $0 <linux version (e.g., ubuntu20.04)> [(optional) path to xctoolchain]"
+		exit 1
 	fi
-	exit 1
+else
+	if [[ $# -ne 2 ]]; then
+		echo "Usage: $0 <linux version (e.g., ubuntu20.04)> [swift version (e.g., 5.8.1)]"
+		exit 1
+	fi
 fi
 
 info() { echo "[info] $1"; }
@@ -21,10 +24,9 @@ err() {
 	exit 1
 }
 
-supported_plats=("ubuntu20.04" "ubuntu20.04-aarch64" "ubuntu22.04" "ubuntu22.04-aarch64" "ubi9" "ubi9-aarch64")
-if ! printf '%s\0' "${supported_plats[@]}" | grep -F -x -z -- "${1}" > /dev/null && \
-   ! printf '%s\0' "${supported_plats[@]}" | grep -F -x -z -- "${2}" > /dev/null; then
-   	err "${1} ${2} is not a valid configuration"
+supported_plats=("ubuntu20.04" "ubuntu20.04-aarch64" "ubuntu22.04" "ubuntu22.04-aarch64" "ubi9" "ubi9-aarch64" "arch" "arch-aarch64")
+if ! printf '%s\0' "${supported_plats[@]}" | grep -F -x -z -- "$1" > /dev/null; then
+   	err "$1 is not a valid configuration"
 fi
 
 mkdir -p toolchains
@@ -44,17 +46,8 @@ if [[ "${is_mac}" = true ]]; then
 	info "Detected Swift version ${swift_version}"
 	cd toolchains
 else
-	swift_version="$1"
-	linux_version="$2"
-	if [[ -z "${linux_version}" ]]; then
-		if [[ -f /etc/os-release ]]; then
-			. /etc/os-release
-			linux_version="${ID}${VERSION_ID}"
-			info "Detected Linux version ${linux_version}"
-		else
-			err "Could not auto-detect Linux version; please pass it as the second argument to '$0'."
-		fi
-	fi
+	linux_version="$1"
+	swift_version="$2"
 	file_name_mac="swift-${swift_version}-RELEASE-osx"
 	package_mac="${file_name_mac}-package.pkg"
 	info "Downloading macOS toolchain"
@@ -69,13 +62,19 @@ else
 	mac_toolchain="mac"
 fi
 
-file_name_linux="swift-${swift_version}-RELEASE-${linux_version}"
+# No Swift OS Arch builds, so use Debian base
+if [[ ${linux_version} == "arch"* ]]; then
+	target_version="${linux_version/arch/ubuntu20.04}"
+else
+	target_version="${linux_version}"
+fi
 
-dl "toolchain-${linux_version}-${swift_version}.tar.gz" "https://swift.org/builds/swift-${swift_version}-release/${linux_version/./}/swift-${swift_version}-RELEASE/${file_name_linux}.tar.gz"
+file_name_linux="swift-${swift_version}-RELEASE-${target_version}"
+dl "toolchain-${target_version}-${swift_version}.tar.gz" "https://swift.org/builds/swift-${swift_version}-release/${target_version/./}/swift-${swift_version}-RELEASE/${file_name_linux}.tar.gz"
 
 info "Unpacking Linux toolchain"
 rm -rf linux
-tar -xvf "toolchain-${linux_version}-${swift_version}.tar.gz"
+tar -xvf "toolchain-${target_version}-${swift_version}.tar.gz"
 mv "${file_name_linux}" linux
 mv linux/{usr,host}
 
@@ -114,24 +113,13 @@ rm linux/iphone/lib/swift/clang
 cp -a linux/{host,iphone}/lib/swift/clang
 # remove borked plutil in favor of plistutil
 rm linux/iphone/bin/plutil
-# remove c++ headers as included in SDK
-rm -rf linux/iphone/include/c++/
+# remove c++ headers as included in SDK [TBD]
+# rm -rf linux/iphone/include/c++/
 
 info "Installing Darwin tools"
 # The hierarchy lines up with ours just right so we dont need to -C
-if [[ "${linux_version}" == *"ubuntu"* ]]; then
-	dl "darwin-tools-${linux_version}.tar.gz" "https://github.com/kabiroberai/darwin-tools-linux/releases/download/v${DARWIN_TOOLS_VERSION}/darwin-tools-${linux_version}.tar.gz"
-	tar -xvf "darwin-tools-${linux_version}.tar.gz"
-# If distro isn't debian-based, use ubuntu20.04 as darwintools base
-else
-	if [[ "${linux_version}" =~ "aarch64" ]]; then
-		dl "darwin-tools-ubuntu20.04-aarch64.tar.gz" "https://github.com/kabiroberai/darwin-tools-linux/releases/download/v${DARWIN_TOOLS_VERSION}/darwin-tools-ubuntu20.04-aarch64.tar.gz"
-		tar -xvf "darwin-tools-ubuntu20.04-aarch64.tar.gz"
-	else
-		dl "darwin-tools-ubuntu20.04.tar.gz" "https://github.com/kabiroberai/darwin-tools-linux/releases/download/v${DARWIN_TOOLS_VERSION}/darwin-tools-ubuntu20.04.tar.gz"
-		tar -xvf "darwin-tools-ubuntu20.04.tar.gz"
-	fi
-fi
+dl "darwin-tools-${linux_version}.tar.gz" "https://github.com/kabiroberai/darwin-tools-linux/releases/download/v${DARWIN_TOOLS_VERSION}/darwin-tools-${linux_version}.tar.gz"
+tar -xvf "darwin-tools-${linux_version}.tar.gz"
 
 info "Packaging toolchain"
 mkdir -p ../packages
