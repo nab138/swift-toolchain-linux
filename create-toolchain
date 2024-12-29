@@ -24,7 +24,7 @@ err() {
 	exit 1
 }
 
-supported_plats=("ubuntu20.04" "ubuntu20.04-aarch64" "ubuntu22.04" "ubuntu22.04-aarch64" "ubi9" "ubi9-aarch64" "arch" "arch-aarch64")
+supported_plats=("ubuntu20.04" "ubuntu22.04" "ubuntu24.04" "fedora39" "archlinux")
 if ! printf '%s\0' "${supported_plats[@]}" | grep -F -x -z -- "$1" > /dev/null; then
    	err "$1 is not a valid configuration"
 fi
