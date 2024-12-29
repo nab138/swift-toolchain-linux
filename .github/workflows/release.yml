@@ -26,7 +26,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu22.04-aarch64, ubuntu22.04, ubuntu20.04-aarch64, ubuntu20.04, ubi9-aarch64, ubi9, arch-aarch64, arch]
+        os: [ubuntu24.04, ubi9, arch]
+        # os: [ubuntu24.04-aarch64, ubuntu24.04, ubuntu22.04-aarch64, ubuntu22.04, ubuntu20.04-aarch64, ubuntu20.04, ubi9-aarch64, ubi9, arch-aarch64, arch]
     runs-on: macos-13
     steps:
     - uses: actions/checkout@v4
