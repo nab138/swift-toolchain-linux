@@ -26,15 +26,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu24.04, ubuntu22.04, ubuntu20.04, fedora39, archlinux]
-    runs-on: macos-13
+        os: [ubuntu24.04, ubuntu24.04-aarch64, ubuntu22.04, ubuntu22.04-aarch64, ubuntu20.04, ubuntu20.04-aarch64, fedora39, archlinux]
+    runs-on: macos-14
     steps:
     - uses: actions/checkout@v4
     - name: Build Release
       id: build_release
       run: |
-        # pin at Swift v5.8.1 as > versions have ABI issues ....
-        DEVELOPER_DIR=/Applications/Xcode_14.3.app/Contents/Developer ./create-toolchain ${{ matrix.os }}
+        DEVELOPER_DIR=/Applications/Xcode_16.1.app/Contents/Developer ./create-toolchain ${{ matrix.os }}
 
     - name: Attach Build To Release
       run: |
