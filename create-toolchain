@@ -112,9 +112,7 @@ cp -a "${mac_toolchain}"/usr/include linux/iphone/include
 rm linux/iphone/lib/swift/clang
 cp -a linux/{host,iphone}/lib/swift/clang
 # remove borked plutil in favor of plistutil
-rm linux/iphone/bin/plutil
-# remove c++ headers as included in SDK [TBD]
-# rm -rf linux/iphone/include/c++/
+rm linux/host/bin/plutil
 
 info "Installing Darwin tools"
 # The hierarchy lines up with ours just right so we dont need to -C
