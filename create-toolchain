@@ -13,7 +13,7 @@ if [[ "${is_mac}" = true ]]; then
 	fi
 else
 	if [[ $# -ne 2 ]]; then
-		echo "Usage: $0 <linux version (e.g., ubuntu20.04)> [swift version (e.g., 5.8.1)]"
+		echo "Usage: $0 <linux version (e.g., ubuntu20.04)> <swift version (e.g., 6.0.3)>"
 		exit 1
 	fi
 fi
