@@ -26,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu24.04, ubuntu24.04-aarch64, ubuntu22.04, ubuntu22.04-aarch64, ubuntu20.04, ubuntu20.04-aarch64, fedora39, fedora39-aarch64, archlinux, archlinux-aarch64]
+        os: [ubuntu24.04, ubuntu22.04, ubuntu20.04]
     runs-on: macos-15
     steps:
     - uses: actions/checkout@v4
